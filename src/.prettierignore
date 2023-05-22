@@ -1,0 +1,9 @@
+CHANGELOG.md
+build
+dist
+node_modules
+public
+*.json
+*.md
+*.yml
+reportWebVitals.js

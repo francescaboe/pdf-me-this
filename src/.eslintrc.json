@@ -1,0 +1,47 @@
+{
+    "extends": [
+        "plugin:prettier/recommended",
+        "plugin:react/recommended",
+        "plugin:import/recommended"
+    ],
+    "parser": "@babel/eslint-parser",
+    "plugins": ["prettier", "react-hooks"],
+    "overrides": [
+        {
+            // 3) Now we enable eslint-plugin-testing-library rules or preset only for matching testing files!
+            "files": ["**/tests/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+            "extends": ["plugin:testing-library/react"]
+        },
+        {
+            "files": ["**/*.test.js"],
+            "rules": {
+                "react/prop-types": 0
+            }
+        }
+    ],
+    "rules": {
+        "prettier/prettier": [
+            2,
+            {
+                "semi": true,
+                "tabWidth": 2,
+                "printWidth": 100,
+                "singleQuote": true,
+                "trailingComma": "none",
+                "bracketSameLine": false,
+                "overrides": [
+                    {
+                        "files": ["*.json"],
+                        "options": {
+                            "tabWidth": 4
+                        }
+                    }
+                ]
+            }
+        ],
+        "react/prop-types": 1,
+        "react/react-in-jsx-scope": "off",
+        "import/no-unresolved": "off",
+        "import/no-named-as-default-member": "off"
+    }
+}
