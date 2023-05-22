@@ -1,13 +1,36 @@
 import React, { useState } from 'react';
 import { PDFDocument } from 'pdf-lib';
-import { Button, Container, Typography, Link } from '@mui/material';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import { FileUploader } from 'react-drag-drop-files';
+import { FileDropBox, StyledGrid, Wrapper } from './styled';
+
+const translations = {
+  en: {
+    add_files: 'Add files',
+    pdf_combiner: 'PDF Combiner',
+    combine_pdfs: 'Combine PDFs',
+    download_combined_pdf: 'Download Combined PDF',
+    reset: 'Reset payload',
+    upload: 'Click or drop to Upload'
+  }
+};
+
+function PDFThumbnailList({ pdfFiles }) {
+  return (
+    <div>
+      {pdfFiles.map((file, index) => (
+        <div key={index}>{file.name}</div>
+      ))}
+    </div>
+  );
+}
 
 function App() {
   const [pdfFiles, setPdfFiles] = useState([]);
   const [combinedPdfBlob, setCombinedPdfBlob] = useState(null);
 
-  const handleFileChange = (event) => {
-    const files = Array.from(event.target.files);
+  const handleFileChange = (files) => {
     setPdfFiles((prevFiles) => [...prevFiles, ...files]);
   };
 
@@ -28,36 +51,59 @@ function App() {
     setCombinedPdfBlob(combinedPdfBlob);
   };
 
+  const handleDownloadPDF = async () => {
+    await handleCombinePDFs();
+
+    if (combinedPdfBlob) {
+      const downloadLink = document.createElement('a');
+      downloadLink.href = URL.createObjectURL(combinedPdfBlob);
+      downloadLink.download = 'combined.pdf';
+      downloadLink.click();
+    }
+  };
+
   const handleReset = () => {
     setPdfFiles([]);
     setCombinedPdfBlob(null);
   };
 
+  let FILE_TYPES = ['PDF'];
   return (
-    <Container maxWidth="sm">
+    <Wrapper container>
       <Typography variant="h4" align="center" gutterBottom>
-        PDF Combiner
+        {translations.en.pdf_combiner}
       </Typography>
-      <input type="file" multiple onChange={handleFileChange} />
-      <Button variant="contained" onClick={handleCombinePDFs} disabled={pdfFiles.length === 0}>
-        Combine PDFs
-      </Button>
-      {combinedPdfBlob && (
-        <div>
-          <Typography variant="h6" align="center" gutterBottom>
-            Combined PDF
-          </Typography>
-          <Link href={URL.createObjectURL(combinedPdfBlob)} download="combined.pdf">
-            Download Combined PDF
-          </Link>
-        </div>
-      )}
-      {pdfFiles.length > 0 && (
-        <Button variant="outlined" onClick={handleReset}>
-          Reset
-        </Button>
-      )}
-    </Container>
+      <StyledGrid container>
+        <StyledGrid item xs={12}>
+          <Button
+            variant="contained"
+            onClick={handleDownloadPDF}
+            disabled={pdfFiles.length === 0}
+            sx={{ marginRight: 2 }}
+          >
+            {translations.en.download_combined_pdf}
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={handleReset}
+            disabled={pdfFiles.length === 0}
+            color="error"
+          >
+            {translations.en.reset}
+          </Button>
+        </StyledGrid>
+        <FileUploader multiple handleChange={handleFileChange} name="file" types={FILE_TYPES}>
+          <StyledGrid item xs={12}>
+            <FileDropBox>
+              <Typography variant="h6" align="center" gutterBottom>
+                {translations.en.upload}
+              </Typography>
+              <PDFThumbnailList pdfFiles={pdfFiles} />
+            </FileDropBox>
+          </StyledGrid>
+        </FileUploader>
+      </StyledGrid>
+    </Wrapper>
   );
 }
 
