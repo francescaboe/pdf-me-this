@@ -4,6 +4,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { FileUploader } from 'react-drag-drop-files';
 import { FileDropBox, StyledGrid, Wrapper } from './styled';
+import PDFThumbnailList from './components/PDFThumbnailList';
 
 const translations = {
   en: {
@@ -12,28 +13,56 @@ const translations = {
     combine_pdfs: 'Combine PDFs',
     download_combined_pdf: 'Download Combined PDF',
     reset: 'Reset payload',
-    upload: 'Click or drop to Upload'
+    upload: 'Click or drop to Upload files',
+    only_types: 'Accepts PDF, JPG, JPEG, PNG'
   }
 };
+const FILE_TYPES = ['PDF', 'JPG', 'JPEG', 'PNG'];
 
-function PDFThumbnailList({ pdfFiles }) {
-  return (
-    <div>
-      {pdfFiles.map((file, index) => (
-        <div key={index}>{file.name}</div>
-      ))}
-    </div>
-  );
+// convert image into pdf
+async function convertImageToPdf(imageFile) {
+  const imageArrayBuffer = await imageFile.arrayBuffer();
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage();
+  const image = await pdfDoc.embedJpg(imageArrayBuffer);
+  const { width, height } = image.scale(1);
+  const dimensions = page.getSize();
+  const scale = Math.min(dimensions.width / width, dimensions.height / height);
+  page.drawImage(image, {
+    x: 0,
+    y: 0,
+    width: width * scale,
+    height: height * scale
+  });
+  const pdfBytes = await pdfDoc.save();
+  return new File([pdfBytes], `${imageFile.name}.pdf`, { type: 'application/pdf' });
 }
 
 function App() {
   const [pdfFiles, setPdfFiles] = useState([]);
-  const [combinedPdfBlob, setCombinedPdfBlob] = useState(null);
 
-  const handleFileChange = (files) => {
-    setPdfFiles((prevFiles) => [...prevFiles, ...files]);
+  // on files input
+  const handleFileChange = async (files) => {
+    const updatedFiles = [];
+
+    for (const file of files) {
+      if (file.type.includes('image')) {
+        const convertedFile = await convertImageToPdf(file);
+        updatedFiles.push(convertedFile);
+      } else {
+        updatedFiles.push(file);
+      }
+    }
+
+    setPdfFiles((prevFiles) => [...prevFiles, ...updatedFiles]);
   };
 
+  // reset payload
+  const handleReset = () => {
+    setPdfFiles([]);
+  };
+
+  // combine all files into one
   const handleCombinePDFs = async () => {
     const pdfDoc = await PDFDocument.create();
 
@@ -47,31 +76,28 @@ function App() {
     }
 
     const combinedPdfBytes = await pdfDoc.save();
-    const combinedPdfBlob = new Blob([combinedPdfBytes], { type: 'application/pdf' });
-    setCombinedPdfBlob(combinedPdfBlob);
+    return new Blob([combinedPdfBytes], { type: 'application/pdf' });
   };
 
+  // download combined pdf
   const handleDownloadPDF = async () => {
-    await handleCombinePDFs();
-
-    if (combinedPdfBlob) {
-      const downloadLink = document.createElement('a');
-      downloadLink.href = URL.createObjectURL(combinedPdfBlob);
-      downloadLink.download = 'combined.pdf';
-      downloadLink.click();
-    }
+    await handleCombinePDFs().then((combinedPdfBlob) => {
+      if (combinedPdfBlob) {
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(combinedPdfBlob);
+        downloadLink.download = 'combined.pdf';
+        downloadLink.click();
+      }
+    });
   };
 
-  const handleReset = () => {
-    setPdfFiles([]);
-    setCombinedPdfBlob(null);
-  };
-
-  let FILE_TYPES = ['PDF'];
   return (
     <Wrapper container>
       <Typography variant="h4" align="center" gutterBottom>
         {translations.en.pdf_combiner}
+      </Typography>
+      <Typography variant="subtitle1" align="center" gutterBottom>
+        {translations.en.only_types}
       </Typography>
       <StyledGrid container>
         <StyledGrid item xs={12}>
