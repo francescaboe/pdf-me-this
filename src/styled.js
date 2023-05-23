@@ -14,14 +14,15 @@ export const Wrapper = styled(Grid)`
 `;
 
 export const FileDropBox = styled(Card)((props) => ({
-  height: '500px',
-  width: '500px',
+  height: '250px',
+  width: '400px',
   display: 'flex',
   flexDirection: 'column',
   padding: '5px',
+  justifyContent: 'center',
   alignItems: 'center',
   marginBottom: '10px',
-  border: `1px grey`,
+  border: `1px dashed grey`,
   cursor: 'pointer',
   overflow: 'scroll'
 }));
