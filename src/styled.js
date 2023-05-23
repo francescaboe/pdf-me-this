@@ -7,10 +7,26 @@ export const StyledGrid = styled(Grid)`
   align-items: center;
   justify-content: center;
 `;
-export const Wrapper = styled(Grid)`
-  //width: 100%;
+
+export const ListContainer = styled(Grid)`
+  display: flex;
+  height: 600px;
+  padding: 32px;
+  overflow: scroll;
+  //border: 1px solid red;
+`;
+export const MainContent = styled(Grid)`
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  padding: 16px;
+  width: 80%;
+`;
+
+export const WrapperColumn = styled(Grid)`
   display: flex;
   flex-direction: column;
+  align-items: center;
 `;
 
 export const FileDropBox = styled(Card)((props) => ({

@@ -3,7 +3,7 @@ import { PDFDocument } from 'pdf-lib';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { FileUploader } from 'react-drag-drop-files';
-import { FileDropBox, StyledGrid, Wrapper } from './styled';
+import { FileDropBox, ListContainer, MainContent, StyledGrid, WrapperColumn } from './styled';
 import PDFThumbnailList from './components/PDFThumbnailList';
 
 const translations = {
@@ -92,44 +92,48 @@ function App() {
   };
 
   return (
-    <Wrapper container>
+    <WrapperColumn container>
       <Typography variant="h4" align="center" gutterBottom>
         {translations.en.pdf_combiner}
       </Typography>
       <Typography variant="subtitle1" align="center" gutterBottom>
         {translations.en.only_types}
       </Typography>
-      <StyledGrid container>
-        <StyledGrid item xs={12}>
-          <Button
-            variant="contained"
-            onClick={handleDownloadPDF}
-            disabled={pdfFiles.length === 0}
-            sx={{ marginRight: 2 }}
-          >
-            {translations.en.download_combined_pdf}
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={handleReset}
-            disabled={pdfFiles.length === 0}
-            color="error"
-          >
-            {translations.en.reset}
-          </Button>
-        </StyledGrid>
-        <FileUploader multiple handleChange={handleFileChange} name="file" types={FILE_TYPES}>
+      <MainContent container>
+        <ListContainer item xs={2}>
+          <PDFThumbnailList pdfFiles={pdfFiles} />
+        </ListContainer>
+        <StyledGrid container item xs={10}>
           <StyledGrid item xs={12}>
-            <FileDropBox>
-              <Typography variant="h6" align="center" gutterBottom>
-                {translations.en.upload}
-              </Typography>
-              <PDFThumbnailList pdfFiles={pdfFiles} />
-            </FileDropBox>
+            <Button
+              variant="contained"
+              onClick={handleDownloadPDF}
+              disabled={pdfFiles.length === 0}
+              sx={{ marginRight: 2 }}
+            >
+              {translations.en.download_combined_pdf}
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={handleReset}
+              disabled={pdfFiles.length === 0}
+              color="error"
+            >
+              {translations.en.reset}
+            </Button>
           </StyledGrid>
-        </FileUploader>
-      </StyledGrid>
-    </Wrapper>
+          <FileUploader multiple handleChange={handleFileChange} name="file" types={FILE_TYPES}>
+            <StyledGrid item xs={12}>
+              <FileDropBox>
+                <Typography variant="h6" align="center" gutterBottom>
+                  {translations.en.upload}
+                </Typography>
+              </FileDropBox>
+            </StyledGrid>
+          </FileUploader>
+        </StyledGrid>
+      </MainContent>
+    </WrapperColumn>
   );
 }
 
