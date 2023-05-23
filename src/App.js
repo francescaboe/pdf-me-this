@@ -13,7 +13,7 @@ const translations = {
     combine_pdfs: 'Combine PDFs',
     download_combined_pdf: 'Download Combined PDF',
     reset: 'Reset payload',
-    upload: 'Click or drop to Upload files',
+    upload: 'Click or drop to upload files',
     only_types: 'Accepts PDF, JPG, JPEG, PNG'
   }
 };
